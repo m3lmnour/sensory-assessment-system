@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بيانات الطفل — كراسة التقييم</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --input-bg: #162032;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --border: #334155;
+      --success: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 18px;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 18px;
+    }
+
+    .header h1 {
+      margin: 0 0 6px;
+      font-size: 1.45rem;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+
+    textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    .age-box {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #bfdbfe;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--input-bg);
+      color: var(--text);
+    }
+
+    .status-msg {
+      margin-top: 12px;
+      font-size: 0.88rem;
+      color: var(--success);
+      min-height: 20px;
+    }
+
+    .saved-preview {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>بيانات الطفل</h1>
+      <p>الصفحة الأساسية لربط أقسام التقييم (التكامل الحسي، المنعكسات، تنمية المهارات) بنفس ملف الطفل</p>
+    </div>
+
+    <form class="card" id="childForm">
+      <div class="grid">
+        <div class="field">
+          <label for="file_code">رقم / كود الملف</label>
+          <input type="text" id="file_code" name="file_code" placeholder="مثال: CH-001" />
+        </div>
+
+        <div class="field">
+          <label for="full_name">اسم الطفل بالكامل *</label>
+          <input type="text" id="full_name" name="full_name" required placeholder="اكتب اسم الطفل" />
+        </div>
+
+        <div class="field">
+          <label for="birth_date">تاريخ الميلاد *</label>
+          <input type="date" id="birth_date" name="birth_date" required onchange="updateAge()" />
+        </div>
+
+        <div class="field">
+          <label>العمر المحسوب تلقائياً</label>
+          <div class="age-box" id="ageDisplay">اختر تاريخ الميلاد لحساب العمر</div>
+        </div>
+
+        <div class="field">
+          <label for="gender">النوع</label>
+          <select id="gender" name="gender">
+            <option value="">اختر النوع</option>
+            <option value="male">ذكر</option>
+            <option value="female">أنثى</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="informant">المجيب (مع ولي الأمر)</label>
+          <select id="informant" name="informant">
+            <option value="">اختر المجيب</option>
+            <option value="الأم">الأم</option>
+            <option value="الأب">الأب</option>
+            <option value="الأم والأب">الأم والأب</option>
+            <option value="مرافق آخر">مرافق آخر</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="diagnosis">التشخيص (إن وُجد)</label>
+          <input type="text" id="diagnosis" name="diagnosis" placeholder="مثال: اضطراب طيف التوحد / تأخر نمائي" />
+        </div>
+
+        <div class="field">
+          <label for="school_or_nursery">المدرسة / الحضانة</label>
+          <input type="text" id="school_or_nursery" name="school_or_nursery" placeholder="اسم المدرسة أو الحضانة" />
+        </div>
+
+        <div class="field full">
+          <label for="medical_notes">ملاحظات طبية أو عامة</label>
+          <textarea id="medical_notes" name="medical_notes" placeholder="أي معلومات إضافية تساعد فريق التقييم في كل الأقسام..."></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary">حفظ بيانات الطفل</button>
+        <button type="button" class="btn-secondary" onclick="clearForm()">تفريغ الحقول</button>
+      </div>
+
+      <div class="status-msg" id="statusMsg"></div>
+    </form>
+
+    <div class="card">
+      <h2 style="margin:0 0 10px; font-size:1.1rem;">ملخص الملف المحفوظ حالياً</h2>
+      <div class="saved-preview" id="savedPreview">لا توجد بيانات محفوظة بعد.</div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "center_child_profile_v1";
+
+    function calculateAge(birthDateStr) {
+      if (!birthDateStr) return null;
+      const birth = new Date(birthDateStr + "T00:00:00");
+      const today = new Date();
+      if (isNaN(birth.getTime()) || birth > today) return null;
+
+      let years = today.getFullYear() - birth.getFullYear();
+      let months = today.getMonth() - birth.getMonth();
+      let days = today.getDate() - birth.getDate();
+
+      if (days < 0) {
+        months -= 1;
+        const prevMonthDays = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+        days += prevMonthDays;
+      }
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+      return { years, months, days };
+    }
+
+    function updateAge() {
+      const val = document.getElementById("birth_date").value;
+      const age = calculateAge(val);
+      const box = document.getElementById("ageDisplay");
+      if (!age) {
+        box.textContent = "اختر تاريخ الميلاد لحساب العمر";
+        return;
+      }
+      box.textContent = `${age.years} سنة و ${age.months} شهر و ${age.days} يوم`;
+    }
+
+    function renderPreview(data) {
+      const preview = document.getElementById("savedPreview");
+      if (!data || !data.full_name) {
+        preview.textContent = "لا توجد بيانات محفوظة بعد.";
+        return;
+      }
+      const age = calculateAge(data.birth_date);
+      const ageText = age ? `${age.years} سنة و ${age.months} شهر و ${age.days} يوم` : "غير محدد";
+      const genderText = data.gender === "male" ? "ذكر" : data.gender === "female" ? "أنثى" : "غير محدد";
+
+      preview.innerHTML = `
+        <strong>كود الملف:</strong> ${data.file_code || "—"} |
+        <strong>الاسم:</strong> ${data.full_name} |
+        <strong>النوع:</strong> ${genderText}<br>
+        <strong>العمر:</strong> ${ageText} |
+        <strong>المجيب:</strong> ${data.informant || "—"} |
+        <strong>التشخيص:</strong> ${data.diagnosis || "—"}<br>
+        <strong>المدرسة/الحضانة:</strong> ${data.school_or_nursery || "—"}<br>
+        <strong>ملاحظات:</strong> ${data.medical_notes || "لا توجد"}
+      `;
+    }
+
+    function fillForm(data) {
+      if (!data) return;
+      document.getElementById("file_code").value = data.file_code || "";
+      document.getElementById("full_name").value = data.full_name || "";
+      document.getElementById("birth_date").value = data.birth_date || "";
+      document.getElementById("gender").value = data.gender || "";
+      document.getElementById("informant").value = data.informant || "";
+      document.getElementById("diagnosis").value = data.diagnosis || "";
+      document.getElementById("school_or_nursery").value = data.school_or_nursery || "";
+      document.getElementById("medical_notes").value = data.medical_notes || "";
+      updateAge();
+      renderPreview(data);
+    }
+
+    document.getElementById("childForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = {
+        id: (JSON.parse(localStorage.getItem(STORAGE_KEY) || "null")?.id) || ("child_" + Date.now()),
+        file_code: document.getElementById("file_code").value.trim(),
+        full_name: document.getElementById("full_name").value.trim(),
+        birth_date: document.getElementById("birth_date").value,
+        gender: document.getElementById("gender").value,
+        informant: document.getElementById("informant").value,
+        diagnosis: document.getElementById("diagnosis").value.trim(),
+        school_or_nursery: document.getElementById("school_or_nursery").value.trim(),
+        medical_notes: document.getElementById("medical_notes").value.trim(),
+        updated_at: new Date().toISOString()
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      renderPreview(data);
+      document.getElementById("statusMsg").textContent = "تم حفظ بيانات الطفل بنجاح (معرّف الملف: " + data.id + ")";
+    });
+
+    function clearForm() {
+      document.getElementById("childForm").reset();
+      updateAge();
+      document.getElementById("statusMsg").textContent = "";
+    }
+
+    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (existing) fillForm(existing);
+  </script>
+</body>
+</html>
